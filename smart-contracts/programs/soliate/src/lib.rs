@@ -1,19 +1,17 @@
 use anchor_lang::prelude::*;
 
-declare_id!("9xjZwkGTG2xkVbxequat9xhocAyXeSxRw3fo3MF4ENmL");
+declare_id!("48gkhnh44Voi4ZuHbNDyeCWWH5dKNJrjmRXvbYwvKjxt");
 
 #[program]
 pub mod soliate {
     use super::*;
 
-    // Khởi tạo danh sách NFT toàn cục
     pub fn initialize_global_list(ctx: Context<InitializeGlobalList>) -> Result<()> {
         let global_nft_list = &mut ctx.accounts.global_nft_list;
         global_nft_list.nfts = Vec::new();
         Ok(())
     }
 
-    // Khởi tạo danh sách NFT cho người dùng
     pub fn initialize_user(ctx: Context<InitializeUser>) -> Result<()> {
         let user_nft_list = &mut ctx.accounts.user_nft_list;
         user_nft_list.user = ctx.accounts.user.key();
@@ -21,7 +19,6 @@ pub mod soliate {
         Ok(())
     }
 
-    // Thêm NFT vào danh sách của người dùng và danh sách toàn cục
     pub fn add_nft(ctx: Context<AddNFT>, nft_address: Pubkey) -> Result<()> {
         let user_nft_list = &mut ctx.accounts.user_nft_list;
         let global_nft_list = &mut ctx.accounts.global_nft_list;
@@ -31,14 +28,13 @@ pub mod soliate {
         Ok(())
     }
 
-    // Khởi tạo NFT Vault
     pub fn initialize_nft_vault(ctx: Context<InitializeNFTVault>, initial_balance: u64) -> Result<()> {
         let nft_vault = &mut ctx.accounts.nft_vault;
         nft_vault.nft = ctx.accounts.nft.key();
         nft_vault.owner = ctx.accounts.owner.key();
         nft_vault.balance = initial_balance;
+        nft_vault.interacted = Vec::new();
 
-        // Chuyển SOL từ chủ sở hữu vào vault
         let transfer_instruction = anchor_lang::solana_program::system_instruction::transfer(
             &ctx.accounts.owner.key(),
             &ctx.accounts.nft_vault.key(),
@@ -56,34 +52,36 @@ pub mod soliate {
         Ok(())
     }
 
-    // Rút tiền từ Vault và chuyển cho hai người
     pub fn withdraw_from_vault(
         ctx: Context<WithdrawFromVault>,
         amount1: u64,
         amount2: u64
     ) -> Result<()> {
         let vault = &mut ctx.accounts.nft_vault;
+        let interactor_key = ctx.accounts.interactor.key();
+
+        if vault.interacted.contains(&interactor_key) {
+            return Err(ErrorCode::AlreadyInteracted.into());
+        }
+
         let total_amount = amount1.checked_add(amount2).ok_or(ErrorCode::OverflowError)?;
 
         if vault.balance < total_amount {
             return Err(ErrorCode::InsufficientFunds.into());
         }
 
-        // Chuyển tiền cho người chia sẻ NFT
         **vault.to_account_info().try_borrow_mut_lamports()? -= amount1;
         **ctx.accounts.sharer.try_borrow_mut_lamports()? += amount1;
 
-        // Chuyển tiền cho người tương tác
         **vault.to_account_info().try_borrow_mut_lamports()? -= amount2;
         **ctx.accounts.interactor.try_borrow_mut_lamports()? += amount2;
 
-        // Cập nhật số dư của vault
         vault.balance -= total_amount;
+        vault.interacted.push(interactor_key);
 
         Ok(())
     }
 
-    // Đăng ký người đăng quảng cáo
     pub fn register_advertiser(
         ctx: Context<RegisterAdvertiser>,
         name: String,
@@ -102,15 +100,19 @@ pub mod soliate {
         advertiser.website = website;
         Ok(())
     }
+    
+    pub fn get_vault_info(ctx: Context<GetVaultInfo>) -> Result<(u64, u64)> {
+        let vault = &ctx.accounts.nft_vault;
+        Ok((vault.balance, vault.interacted.len() as u64))
+    }
 }
 
-// Cấu trúc để khởi tạo danh sách NFT toàn cục
 #[derive(Accounts)]
 pub struct InitializeGlobalList<'info> {
     #[account(
         init,
         payer = authority,
-        space = 8 + 4 + (100 * 32), // Điều chỉnh kích thước nếu cần
+        space = 8 + 4 + (100 * 32),
         seeds = [b"global_nft_list"],
         bump
     )]
@@ -120,13 +122,12 @@ pub struct InitializeGlobalList<'info> {
     pub system_program: Program<'info, System>,
 }
 
-// Cấu trúc để khởi tạo danh sách NFT cho người dùng
 #[derive(Accounts)]
 pub struct InitializeUser<'info> {
     #[account(
         init,
         payer = user,
-        space = 8 + 32 + 4 + (5 * 32), // Điều chỉnh kích thước nếu cần
+        space = 8 + 32 + 4 + (5 * 32),
         seeds = [b"user_nft_list", user.key().as_ref()],
         bump
     )]
@@ -136,7 +137,6 @@ pub struct InitializeUser<'info> {
     pub system_program: Program<'info, System>,
 }
 
-// Cấu trúc để thêm NFT vào danh sách
 #[derive(Accounts)]
 pub struct AddNFT<'info> {
     #[account(
@@ -155,7 +155,6 @@ pub struct AddNFT<'info> {
     pub user: Signer<'info>,
 }
 
-// Cấu trúc để khởi tạo NFT Vault
 #[derive(Accounts)]
 pub struct InitializeNFTVault<'info> {
     #[account(mut)]
@@ -163,7 +162,7 @@ pub struct InitializeNFTVault<'info> {
     #[account(
         init,
         payer = owner,
-        space = 8 + 32 + 32 + 8,
+        space = 8 + 32 + 32 + 8 + 4 + (100 * 32), // Cấp phát không gian cho 1000 interactor
         seeds = [b"nft_vault", nft.key().as_ref()],
         bump
     )]
@@ -173,7 +172,6 @@ pub struct InitializeNFTVault<'info> {
     pub system_program: Program<'info, System>,
 }
 
-// Cấu trúc để rút tiền từ Vault
 #[derive(Accounts)]
 pub struct WithdrawFromVault<'info> {
     #[account(
@@ -193,13 +191,12 @@ pub struct WithdrawFromVault<'info> {
     pub system_program: Program<'info, System>,
 }
 
-// Cấu trúc để đăng ký người đăng quảng cáo
 #[derive(Accounts)]
 pub struct RegisterAdvertiser<'info> {
     #[account(
         init,
         payer = authority,
-        space = 8 + 32 + 32 + 32 + 32, // Điều chỉnh kích thước nếu cần
+        space = 8 + 32 + 32 + 32 + 32,
         seeds = [b"advertiser", authority.key().as_ref()],
         bump
     )]
@@ -209,28 +206,36 @@ pub struct RegisterAdvertiser<'info> {
     pub system_program: Program<'info, System>,
 }
 
-// Định nghĩa cấu trúc danh sách NFT của người dùng
+#[derive(Accounts)]
+pub struct GetVaultInfo<'info> {
+    #[account(
+        seeds = [b"nft_vault", nft.key().as_ref()],
+        bump
+    )]
+    pub nft_vault: Account<'info, NFTVault>,
+    /// CHECK: Chỉ sử dụng làm seed, không đọc hoặc ghi
+    pub nft: AccountInfo<'info>,
+}
+
 #[account]
 pub struct UserNFTList {
     pub user: Pubkey,
     pub nfts: Vec<Pubkey>,
 }
 
-// Định nghĩa cấu trúc danh sách NFT toàn cục
 #[account]
 pub struct GlobalNFTList {
     pub nfts: Vec<Pubkey>,
 }
 
-// Định nghĩa cấu trúc NFT Vault
 #[account]
 pub struct NFTVault {
     pub nft: Pubkey,
     pub owner: Pubkey,
     pub balance: u64,
+    pub interacted: Vec<Pubkey>,
 }
 
-// Định nghĩa cấu trúc người đăng quảng cáo
 #[account]
 pub struct Advertiser {
     pub name: String,
@@ -239,7 +244,7 @@ pub struct Advertiser {
     pub website: Option<String>,
 }
 
-// Định nghĩa mã lỗi
+
 #[error_code]
 pub enum ErrorCode {
     #[msg("Không đủ tiền trong vault")]
@@ -248,4 +253,8 @@ pub enum ErrorCode {
     OverflowError,
     #[msg("Dữ liệu người đăng quảng cáo không hợp lệ")]
     InvalidAdvertiserData,
+    #[msg("Người dùng không được phép thực hiện hành động này")]
+    NotAuthorized,
+    #[msg("Interactor đã nhận tiền từ vault này")]
+    AlreadyInteracted,
 }

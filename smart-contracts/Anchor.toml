@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-soliate = "9xjZwkGTG2xkVbxequat9xhocAyXeSxRw3fo3MF4ENmL"
+soliate = "48gkhnh44Voi4ZuHbNDyeCWWH5dKNJrjmRXvbYwvKjxt"
 
 [registry]
 url = "https://api.apr.dev"
