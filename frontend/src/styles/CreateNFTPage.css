@@ -1,0 +1,140 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.create-nft-form {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+.create-nft-form h2 {
+    margin-bottom: 20px;
+    color: #000000;
+    /* Đổi màu tiêu đề sang đen */
+    font-size: 24px;
+}
+
+.create-nft-form input[type="text"],
+.create-nft-form input[type="number"],
+.create-nft-form textarea,
+.create-nft-form input[type="file"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+}
+
+.create-nft-form input[type="text"]:focus,
+.create-nft-form input[type="number"]:focus,
+.create-nft-form textarea:focus,
+.create-nft-form input[type="file"]:focus {
+    border-color: #000000;
+    /* Đổi màu viền khi focus sang đen */
+    outline: none;
+}
+
+.create-nft-form textarea {
+    height: 100px;
+    resize: none;
+}
+
+.create-nft-form button {
+    background-color: #000000;
+    /* Đổi màu nền nút sang đen */
+    color: #ffffff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.create-nft-form button:hover {
+    background-color: #333333;
+    /* Đổi màu nền nút khi hover sang đen sáng hơn */
+}
+
+.create-nft-form button:active {
+    transform: scale(0.98);
+}
+
+.create-nft-form button:disabled {
+    background-color: #b0bec5;
+    cursor: not-allowed;
+}
+
+.create-nft-form input[type="file"] {
+    padding: 5px;
+}
+
+.create-nft-form input[type="file"]::file-selector-button {
+    padding: 10px 15px;
+    background-color: #000000;
+    /* Đổi màu nền nút chọn file sang đen */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.create-nft-form input[type="file"]::file-selector-button:hover {
+    background-color: #333333;
+    /* Đổi màu nền nút chọn file khi hover sang đen sáng hơn */
+}
+
+.create-nft-form input[type="file"]::file-selector-button:active {
+    transform: scale(0.98);
+}
+
+.create-nft-form input[type="file"]::file-selector-button:disabled {
+    background-color: #b0bec5;
+    cursor: not-allowed;
+}
+
+.create-nft-form input[type="file"]::file-selector-button:disabled:hover {
+    background-color: #b0bec5;
+}
+
+.create-nft-form input[type="number"]::-webkit-outer-spin-button,
+.create-nft-form input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+@media (max-width: 480px) {
+    .create-nft-form {
+        padding: 20px;
+    }
+
+    .create-nft-form h2 {
+        font-size: 20px;
+    }
+
+    .create-nft-form button {
+        font-size: 14px;
+    }
+}

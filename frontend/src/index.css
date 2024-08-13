@@ -1,0 +1,46 @@
+body {
+  margin: 0;
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+.App {
+  text-align: center;
+}
+
+
+.buttons {
+  text-align: center;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+
+footer {
+  background-color: #000000;
+  /* Black background for the footer */
+  color: #ffffff;
+  /* White text color in the footer */
+  text-align: center;
+  padding: 20px 0;
+  margin-top: 40px;
+}
+
+footer p {
+  margin: 0;
+  font-size: 0.9em;
+}
+
+@media (max-width: 768px) {
+  .feature {
+    width: 100%;
+  }
+}
+
+
