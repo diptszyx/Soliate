@@ -1,0 +1,424 @@
+{
+  "address": "48gkhnh44Voi4ZuHbNDyeCWWH5dKNJrjmRXvbYwvKjxt",
+  "metadata": {
+    "name": "soliate",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "add_nft",
+      "discriminator": [55, 57, 85, 145, 81, 134, 220, 223],
+      "accounts": [
+        {
+          "name": "user_nft_list",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117, 115, 101, 114, 95, 110, 102, 116, 95, 108, 105, 115, 116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "global_nft_list",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103, 108, 111, 98, 97, 108, 95, 110, 102, 116, 95, 108, 105,
+                  115, 116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "signer": true,
+          "relations": ["user_nft_list"]
+        }
+      ],
+      "args": [
+        {
+          "name": "nft_address",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "get_vault_info",
+      "discriminator": [38, 82, 205, 68, 179, 76, 219, 19],
+      "accounts": [
+        {
+          "name": "nft_vault",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [110, 102, 116, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "nft"
+              }
+            ]
+          }
+        },
+        {
+          "name": "nft"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_global_list",
+      "discriminator": [133, 74, 48, 220, 94, 249, 33, 201],
+      "accounts": [
+        {
+          "name": "global_nft_list",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103, 108, 111, 98, 97, 108, 95, 110, 102, 116, 95, 108, 105,
+                  115, 116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_nft_vault",
+      "discriminator": [209, 105, 94, 114, 107, 204, 169, 221],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "nft_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [110, 102, 116, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "nft"
+              }
+            ]
+          }
+        },
+        {
+          "name": "nft"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "initial_balance",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initialize_user",
+      "discriminator": [111, 17, 185, 250, 60, 122, 38, 254],
+      "accounts": [
+        {
+          "name": "user_nft_list",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117, 115, 101, 114, 95, 110, 102, 116, 95, 108, 105, 115, 116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "register_advertiser",
+      "discriminator": [84, 128, 147, 40, 20, 57, 251, 188],
+      "accounts": [
+        {
+          "name": "advertiser",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [97, 100, 118, 101, 114, 116, 105, 115, 101, 114]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "email",
+          "type": "string"
+        },
+        {
+          "name": "company",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "website",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "withdraw_from_vault",
+      "discriminator": [180, 34, 37, 46, 156, 0, 211, 238],
+      "accounts": [
+        {
+          "name": "nft_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [110, 102, 116, 95, 118, 97, 117, 108, 116]
+              },
+              {
+                "kind": "account",
+                "path": "nft"
+              }
+            ]
+          }
+        },
+        {
+          "name": "nft"
+        },
+        {
+          "name": "sharer",
+          "writable": true
+        },
+        {
+          "name": "interactor",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount1",
+          "type": "u64"
+        },
+        {
+          "name": "amount2",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Advertiser",
+      "discriminator": [224, 189, 134, 74, 86, 113, 216, 184]
+    },
+    {
+      "name": "GlobalNFTList",
+      "discriminator": [201, 213, 196, 108, 86, 118, 14, 191]
+    },
+    {
+      "name": "NFTVault",
+      "discriminator": [156, 179, 202, 173, 111, 225, 209, 88]
+    },
+    {
+      "name": "UserNFTList",
+      "discriminator": [113, 137, 192, 118, 212, 151, 121, 91]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InsufficientFunds",
+      "msg": "Không đủ tiền trong vault"
+    },
+    {
+      "code": 6001,
+      "name": "OverflowError",
+      "msg": "Lỗi tràn số khi cộng số tiền"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidAdvertiserData",
+      "msg": "Dữ liệu người đăng quảng cáo không hợp lệ"
+    },
+    {
+      "code": 6003,
+      "name": "NotAuthorized",
+      "msg": "Người dùng không được phép thực hiện hành động này"
+    },
+    {
+      "code": 6004,
+      "name": "AlreadyInteracted",
+      "msg": "Interactor đã nhận tiền từ vault này"
+    }
+  ],
+  "types": [
+    {
+      "name": "Advertiser",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          },
+          {
+            "name": "company",
+            "type": {
+              "option": "string"
+            }
+          },
+          {
+            "name": "website",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GlobalNFTList",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nfts",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "NFTVault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nft",
+            "type": "pubkey"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
+          },
+          {
+            "name": "interacted",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserNFTList",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "nfts",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
