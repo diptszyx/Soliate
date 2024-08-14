@@ -366,7 +366,7 @@ function CreateNFTPage({ walletAddress, connectWallet }) {
             <p>Viewer will receive: {viewerShare} SOL</p>
           </div>
           <button onClick={handleCreateNFT} disabled={isCreating}>
-            {isCreating ? "Creating..." : "Create NFT"}
+            {isCreating ? "Creating..." : "Create Campaign"}
           </button>
         </div>
       </main>
