@@ -10,6 +10,8 @@ import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { useNavigate } from "react-router-dom";
 import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
 import idl from "../idl.json";
+import { ToastContainer, toast } from "react-toastify"; // Import React-Toastify
+import "react-toastify/dist/ReactToastify.css"; // Import CSS của React-Toastify
 
 const UserContext = createContext();
 
@@ -107,16 +109,24 @@ export const UserProvider = ({ children }) => {
             navigate("/ad-dashboard");
           } else {
             console.log("Not recognized as advertiser");
-            alert(
-              "You are not recognized as an advertiser. Please check your registration or try again."
+            toast.warning(
+              "You are not recognized as an advertiser. Please check your registration or try again.",
+              {
+                position: "top-center",
+                autoClose: 3000,
+              }
             );
             await disconnectWallet();
           }
         } else if (["home", "list", "detail"].includes(page)) {
           if (isAdv) {
             console.log("Advertiser trying to access user pages");
-            alert(
-              "This wallet is registered for a different role. Your wallet will be disconnected."
+            toast.warning(
+              "This wallet is registered for a different role. Your wallet will be disconnected.",
+              {
+                position: "top-center",
+                autoClose: 3000,
+              }
             );
             await disconnectWallet();
           } else {
@@ -125,10 +135,19 @@ export const UserProvider = ({ children }) => {
         }
       } catch (err) {
         console.error("Connection failed:", err);
-        alert("Connection failed. Please try again.");
+        toast.error("Connection failed. Please try again.", {
+          position: "top-center",
+          autoClose: 3000,
+        });
       }
     } else {
-      alert("Phantom Wallet is not installed. Please install Phantom Wallet.");
+      toast.error(
+        "Phantom Wallet is not installed. Please install Phantom Wallet.",
+        {
+          position: "top-center",
+          autoClose: 3000,
+        }
+      );
     }
   };
 
@@ -144,6 +163,7 @@ export const UserProvider = ({ children }) => {
       }}
     >
       {children}
+      <ToastContainer /> {/* Add ToastContainer to render toasts */}
     </UserContext.Provider>
   );
 };

@@ -5,7 +5,9 @@ import { Metaplex } from "@metaplex-foundation/js";
 import { Program } from "@coral-xyz/anchor";
 import { FaCopy } from "react-icons/fa";
 import styles from "../styles/NFTDetail.module.css";
-import idl from "../idl.json"; // Đảm bảo đường dẫn đúng đến file IDL của bạn
+import idl from "../idl.json";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function NFTDetail({ walletAddress, connectWallet }) {
   const { address } = useParams();
@@ -85,7 +87,10 @@ function NFTDetail({ walletAddress, connectWallet }) {
 
   const handleGenerateBlink = async () => {
     if (!walletAddress) {
-      alert("Please connect your wallet first.");
+      toast.error("Please connect your wallet first.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
       await connectWallet();
       return;
     }
@@ -178,6 +183,7 @@ function NFTDetail({ walletAddress, connectWallet }) {
           </div>
         )}
       </div>
+      <ToastContainer />
     </div>
   );
 }

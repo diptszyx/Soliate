@@ -5,6 +5,10 @@ import idl from "../idl.json";
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import "../styles/AdvertiserForm.css";
 
+// Import ToastContainer và toast từ React-Toastify
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const programId = new PublicKey(idl.address);
 
 function AdvertiserForm({ walletAddress, connectWallet }) {
@@ -29,7 +33,10 @@ function AdvertiserForm({ walletAddress, connectWallet }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!walletAddress) {
-      alert("Please connect your wallet first.");
+      toast.error("Please connect your wallet first.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
       await connectWallet();
       return;
     }
@@ -135,6 +142,7 @@ function AdvertiserForm({ walletAddress, connectWallet }) {
           {isLoading ? "Registering..." : "Register"}
         </button>
       </form>
+      <ToastContainer />
     </div>
   );
 }

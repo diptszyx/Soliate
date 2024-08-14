@@ -14,10 +14,11 @@ import {
 import { WebIrys } from "@irys/sdk";
 import { PhantomWalletAdapter } from "@solana/wallet-adapter-phantom";
 import { useNavigate } from "react-router-dom";
-import Footer from "./Footer";
 import { AnchorProvider, Program, setProvider, web3 } from "@coral-xyz/anchor";
 import idl from "../idl.json";
 import BN from "bn.js";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const programId = new PublicKey(idl.address);
 
@@ -207,18 +208,27 @@ function CreateNFTPage({ walletAddress, connectWallet }) {
 
   const handleCreateNFT = async () => {
     if (!walletAddress) {
-      alert("Please connect your wallet first.");
+      toast.error("Please connect your wallet first.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
       await connectWallet();
       return;
     }
 
     if (!image || !(image instanceof File)) {
-      alert("Please select a valid image file.");
+      toast.error("Please select a valid image file.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
       return;
     }
 
     if (parseInt(solAmount) < 1) {
-      alert("Please enter a valid SOL amount (minimum 1 SOL).");
+      toast.error("Please enter a valid SOL amount (minimum 1 SOL).", {
+        position: "top-center",
+        autoClose: 3000,
+      });
       return;
     }
 
@@ -286,13 +296,20 @@ function CreateNFTPage({ walletAddress, connectWallet }) {
         `https://explorer.solana.com/address/${nftVaultPda.toString()}?cluster=devnet`
       );
 
-      alert(
-        `NFT created, added to lists, and vault initialized successfully!\n\nVault Address: ${nftVaultPda.toString()}\n\nView on Solana Explorer: https://explorer.solana.com/address/${nftVaultPda.toString()}?cluster=devnet`
+      toast.success(
+        `NFT created, added to lists, and vault initialized successfully!\n\nVault Address: ${nftVaultPda.toString()}\n\nView on Solana Explorer: https://explorer.solana.com/address/${nftVaultPda.toString()}?cluster=devnet`,
+        {
+          position: "top-center",
+          autoClose: 5000,
+        }
       );
       navigate("/ad-dashboard");
     } catch (error) {
       console.error("Error creating NFT:", error);
-      alert(`Error creating NFT: ${error.message}`);
+      toast.error(`Error creating NFT: ${error.message}`, {
+        position: "top-center",
+        autoClose: 5000,
+      });
     } finally {
       setIsCreating(false);
     }
@@ -353,7 +370,7 @@ function CreateNFTPage({ walletAddress, connectWallet }) {
           </button>
         </div>
       </main>
-      <Footer />
+      <ToastContainer />
     </div>
   );
 }

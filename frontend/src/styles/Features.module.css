@@ -3,6 +3,8 @@
     flex-wrap: wrap;
     justify-content: space-between;
     margin: 40px 0;
+    background-color: #f5f5f5;
+    padding: 40px 0;
 }
 
 .container {
@@ -18,24 +20,91 @@
 
 .highlight {
     color: #00dfd8;
-    /* Màu xanh neon giống Solana */
     font-weight: bold;
+}
+
+.featuresList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.featureItem {
+    flex-basis: calc(50% - 20px);
+    margin-bottom: 30px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.featureItem h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.testimonial {
+    background-color: #e6f7ff;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 30px 0;
+}
+
+.testimonial blockquote {
+    font-style: italic;
+    margin-bottom: 10px;
+}
+
+.testimonial cite {
+    font-weight: bold;
+}
+
+.ctaSection {
+    background-color: #f0f0f0;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 40px;
 }
 
 .buttonGroup {
     margin-top: 20px;
 }
 
-.primaryButton {
-    padding: 0.5rem 1rem;
+.primaryButton,
+.secondaryButton {
+    padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 4px;
-    background-color: #000000;
-    /* Nền đen cho nút bấm */
-    color: #ffffff;
-    /* Chữ trắng */
     font-weight: bold;
     cursor: pointer;
-    font-size: 0.875rem;
-    /* Kích thước chữ nhỏ hơn */
+    font-size: 1rem;
+    margin: 0 10px;
+    transition: background-color 0.3s ease;
+}
+
+.primaryButton {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.secondaryButton {
+    background-color: #ffffff;
+    color: #000000;
+    border: 2px solid #000000;
+}
+
+.primaryButton:hover {
+    background-color: #333333;
+}
+
+.secondaryButton:hover {
+    background-color: #f0f0f0;
+}
+
+@media (max-width: 768px) {
+    .featureItem {
+        flex-basis: 100%;
+    }
 }
