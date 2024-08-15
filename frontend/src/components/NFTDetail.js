@@ -9,7 +9,7 @@ import idl from "../idl.json";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function NFTDetail({ walletAddress, connectWallet }) {
+function NFTDetail({ walletAddress }) {
   const { address } = useParams();
   const [nft, setNft] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -89,9 +89,8 @@ function NFTDetail({ walletAddress, connectWallet }) {
     if (!walletAddress) {
       toast.error("Please connect your wallet first.", {
         position: "top-center",
-        autoClose: 3000,
+        autoClose: 1000,
       });
-      await connectWallet();
       return;
     }
     const amountForSharer =
@@ -109,7 +108,7 @@ function NFTDetail({ walletAddress, connectWallet }) {
       parseFloat(amountForInteractor) * 1e9
     );
 
-    const blinkUrl = `https://dial.to/devnet?action=solana-action:http://localhost:3001/api/action?mintAddress=${encodeURIComponent(
+    const blinkUrl = `https://dial.to/devnet?action=solana-action:https://backend-sigma-silk-80.vercel.app/api/action?mintAddress=${encodeURIComponent(
       address
     )}%26sharerAddress=${encodeURIComponent(
       walletAddress

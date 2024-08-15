@@ -210,16 +210,15 @@ function CreateNFTPage({ walletAddress, connectWallet }) {
     if (!walletAddress) {
       toast.error("Please connect your wallet first.", {
         position: "top-center",
-        autoClose: 3000,
+        autoClose: 1000,
       });
-      await connectWallet();
       return;
     }
 
     if (!image || !(image instanceof File)) {
       toast.error("Please select a valid image file.", {
         position: "top-center",
-        autoClose: 3000,
+        autoClose: 1000,
       });
       return;
     }
@@ -227,7 +226,7 @@ function CreateNFTPage({ walletAddress, connectWallet }) {
     if (parseInt(solAmount) < 1) {
       toast.error("Please enter a valid SOL amount (minimum 1 SOL).", {
         position: "top-center",
-        autoClose: 3000,
+        autoClose: 1000,
       });
       return;
     }
@@ -297,10 +296,10 @@ function CreateNFTPage({ walletAddress, connectWallet }) {
       );
 
       toast.success(
-        `NFT created, added to lists, and vault initialized successfully!\n\nVault Address: ${nftVaultPda.toString()}\n\nView on Solana Explorer: https://explorer.solana.com/address/${nftVaultPda.toString()}?cluster=devnet`,
+        `Successfully!`,
         {
           position: "top-center",
-          autoClose: 5000,
+          autoClose: 1000,
         }
       );
       navigate("/ad-dashboard");
@@ -308,7 +307,7 @@ function CreateNFTPage({ walletAddress, connectWallet }) {
       console.error("Error creating NFT:", error);
       toast.error(`Error creating NFT: ${error.message}`, {
         position: "top-center",
-        autoClose: 5000,
+        autoClose: 1000,
       });
     } finally {
       setIsCreating(false);

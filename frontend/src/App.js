@@ -93,7 +93,6 @@ function App() {
                 walletAddress={walletAddress}
               />
               <AdvertiserForm
-                connectWallet={() => checkAndConnectWallet("advertiser-form")}
                 walletAddress={walletAddress}
               />
               <Footer />
@@ -124,7 +123,6 @@ function App() {
                 walletAddress={walletAddress}
               />
               <CreateNFT
-                connectWallet={() => checkAndConnectWallet("create")}
                 walletAddress={walletAddress}
               />
               <Footer />
@@ -155,7 +153,6 @@ function App() {
                 walletAddress={walletAddress}
               />
               <NFTDetail
-                connectWallet={() => checkAndConnectWallet("detail")}
                 walletAddress={walletAddress}
               />
               <Footer />

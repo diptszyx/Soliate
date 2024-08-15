@@ -12,7 +12,7 @@ const BN = require("bn.js");
 const idl = require("./idl.json");
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 app.use(express.json());
 
@@ -172,5 +172,5 @@ app
   });
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });

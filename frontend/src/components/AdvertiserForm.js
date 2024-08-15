@@ -4,14 +4,12 @@ import { useNavigate } from "react-router-dom";
 import idl from "../idl.json";
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import "../styles/AdvertiserForm.css";
-
-// Import ToastContainer và toast từ React-Toastify
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const programId = new PublicKey(idl.address);
 
-function AdvertiserForm({ walletAddress, connectWallet }) {
+function AdvertiserForm({ walletAddress}) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -35,9 +33,8 @@ function AdvertiserForm({ walletAddress, connectWallet }) {
     if (!walletAddress) {
       toast.error("Please connect your wallet first.", {
         position: "top-center",
-        autoClose: 3000,
+        autoClose: 1000,
       });
-      await connectWallet();
       return;
     }
 

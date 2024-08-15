@@ -10,8 +10,8 @@ import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { useNavigate } from "react-router-dom";
 import { Program, AnchorProvider, web3 } from "@coral-xyz/anchor";
 import idl from "../idl.json";
-import { ToastContainer, toast } from "react-toastify"; // Import React-Toastify
-import "react-toastify/dist/ReactToastify.css"; // Import CSS của React-Toastify
+import { ToastContainer, toast } from "react-toastify"; 
+import "react-toastify/dist/ReactToastify.css"; 
 
 const UserContext = createContext();
 
@@ -113,7 +113,7 @@ export const UserProvider = ({ children }) => {
               "You are not recognized as an advertiser. Please check your registration or try again.",
               {
                 position: "top-center",
-                autoClose: 3000,
+                autoClose: 1000,
               }
             );
             await disconnectWallet();
@@ -125,7 +125,7 @@ export const UserProvider = ({ children }) => {
               "This wallet is registered for a different role. Your wallet will be disconnected.",
               {
                 position: "top-center",
-                autoClose: 3000,
+                autoClose: 1000,
               }
             );
             await disconnectWallet();
@@ -137,7 +137,7 @@ export const UserProvider = ({ children }) => {
         console.error("Connection failed:", err);
         toast.error("Connection failed. Please try again.", {
           position: "top-center",
-          autoClose: 3000,
+          autoClose: 1000,
         });
       }
     } else {
@@ -145,7 +145,7 @@ export const UserProvider = ({ children }) => {
         "Phantom Wallet is not installed. Please install Phantom Wallet.",
         {
           position: "top-center",
-          autoClose: 3000,
+          autoClose: 1000,
         }
       );
     }
