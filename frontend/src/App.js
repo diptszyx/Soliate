@@ -13,7 +13,6 @@ import NFTDetail from "./components/NFTDetail";
 import AdDashboard from "./components/AdDashboard";
 import { UserProvider, WithAuth, useUser } from "./utils/AuthUtils";
 
-
 function App() {
   const { walletAddress, checkAndConnectWallet } = useUser();
 
@@ -92,9 +91,7 @@ function App() {
                 connectWallet={() => checkAndConnectWallet("advertiser-form")}
                 walletAddress={walletAddress}
               />
-              <AdvertiserForm
-                walletAddress={walletAddress}
-              />
+              <AdvertiserForm walletAddress={walletAddress} />
               <Footer />
             </WithAuth>
           }
@@ -122,9 +119,7 @@ function App() {
                 connectWallet={() => checkAndConnectWallet("create")}
                 walletAddress={walletAddress}
               />
-              <CreateNFT
-                walletAddress={walletAddress}
-              />
+              <CreateNFT walletAddress={walletAddress} />
               <Footer />
             </WithAuth>
           }
@@ -152,9 +147,7 @@ function App() {
                 connectWallet={() => checkAndConnectWallet("detail")}
                 walletAddress={walletAddress}
               />
-              <NFTDetail
-                walletAddress={walletAddress}
-              />
+              <NFTDetail walletAddress={walletAddress} />
               <Footer />
             </WithAuth>
           }

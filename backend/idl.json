@@ -1,5 +1,5 @@
 {
-  "address": "48gkhnh44Voi4ZuHbNDyeCWWH5dKNJrjmRXvbYwvKjxt",
+  "address": "8VrAqUMUAht5KTJXbmqAbfnnS1MFGTBtkSPCw8dELrV",
   "metadata": {
     "name": "soliate",
     "version": "0.1.0",
@@ -54,6 +54,58 @@
         {
           "name": "nft_address",
           "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "create_action_pda",
+      "discriminator": [172, 96, 167, 58, 126, 54, 192, 100],
+      "accounts": [
+        {
+          "name": "action_pda",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [97, 99, 116, 105, 111, 110]
+              },
+              {
+                "kind": "account",
+                "path": "mint_address"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint_address"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "mint_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "sharer_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "amount_for_sharer",
+          "type": "u64"
+        },
+        {
+          "name": "amount_for_interactor",
+          "type": "u64"
         }
       ]
     },
@@ -290,6 +342,10 @@
   ],
   "accounts": [
     {
+      "name": "ActionData",
+      "discriminator": [9, 110, 3, 203, 173, 248, 187, 184]
+    },
+    {
       "name": "Advertiser",
       "discriminator": [224, 189, 134, 74, 86, 113, 216, 184]
     },
@@ -334,6 +390,30 @@
     }
   ],
   "types": [
+    {
+      "name": "ActionData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "sharer_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount_for_sharer",
+            "type": "u64"
+          },
+          {
+            "name": "amount_for_interactor",
+            "type": "u64"
+          }
+        ]
+      }
+    },
     {
       "name": "Advertiser",
       "type": {

@@ -2,12 +2,13 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
 import { Metaplex } from "@metaplex-foundation/js";
-import { Program } from "@coral-xyz/anchor";
+import { Program, web3, setProvider, AnchorProvider } from "@coral-xyz/anchor";
 import { FaCopy } from "react-icons/fa";
 import styles from "../styles/NFTDetail.module.css";
 import idl from "../idl.json";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BN from "bn.js";
 
 function NFTDetail({ walletAddress }) {
   const { address } = useParams();
@@ -108,12 +109,42 @@ function NFTDetail({ walletAddress }) {
       parseFloat(amountForInteractor) * 1e9
     );
 
-    const blinkUrl = `https://dial.to/devnet?action=solana-action:https://backend-sigma-silk-80.vercel.app/api/action?mintAddress=${encodeURIComponent(
-      address
-    )}%26sharerAddress=${encodeURIComponent(
-      walletAddress
-    )}%26amountForSharer=${amountForSharerLamports}%26amountForInteractor=${amountForInteractorLamports}`;
-    setBlinkUrl(blinkUrl);
+    try {
+      const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+      const programId = new PublicKey(idl.address);
+      const provider = new AnchorProvider(connection, window.solana, {
+        preflightCommitment: "confirmed",
+      });
+      setProvider(provider);
+
+      const [actionPDA] = PublicKey.findProgramAddressSync(
+        [Buffer.from("action"), new PublicKey(address).toBuffer()],
+        programId
+      );
+
+      const program = new Program(idl, programId);
+      const tx = await program.methods
+        .createActionPda(
+          new PublicKey(address),
+          new PublicKey(walletAddress),
+          new BN(amountForSharerLamports),
+          new BN(amountForInteractorLamports)
+        )
+        .accounts({
+          actionPda: actionPDA,
+          user: new PublicKey(walletAddress),
+          mintAddress: new PublicKey(address),
+          systemProgram: web3.SystemProgram.programId,
+        })
+        .transaction();
+
+      await provider.sendAndConfirm(tx);
+      const blinkUrl = `https://dial.to/?action=solana-action:http://localhost:3001/api/action/${actionPDA.toBase58()}`;
+      setBlinkUrl(blinkUrl);
+    } catch (error) {
+      console.error("Error creating action PDA:", error);
+      toast.error("Failed to generate Blink URL. Please try again.");
+    }
   };
 
   const handleCopyUrl = () => {

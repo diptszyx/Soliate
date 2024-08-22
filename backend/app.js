@@ -40,17 +40,51 @@ async function getNFTDetails(mintAddress) {
   }
 }
 
-// Route GET và POST cho /api/action
 app
-  .route("/api/action")
+  .route("/api/action/:pda")
   .get(async (req, res) => {
-    const mintAddress = req.query.mintAddress;
+    const actionPDA = req.params.pda;
+    console.log("Received PDA:", actionPDA);
 
-    if (!mintAddress) {
-      return res.status(400).json({ error: "Missing mintAddress parameter" });
+    if (!actionPDA) {
+      return res.status(400).json({ error: "Missing PDA parameter" });
     }
 
     try {
+      const connection = new Connection(clusterApiUrl("devnet"));
+      const programId = new PublicKey(idl.address);
+      const program = new Program(idl, programId);
+
+      // Lấy thông tin tài khoản
+      const accountInfo = await connection.getAccountInfo(
+        new PublicKey(actionPDA)
+      );
+
+      if (!accountInfo) {
+        return res.status(404).json({ error: "Action PDA not found" });
+      }
+
+      // Giải mã dữ liệu tài khoản
+      const decodedAccountInfo = program.coder.accounts.decode(
+        "actionData",
+        accountInfo.data
+      );
+
+      const {
+        mintAddress,
+        sharerAddress,
+        amountForSharer,
+        amountForInteractor,
+      } = decodedAccountInfo;
+
+      console.log("Decoded Info:", {
+        mintAddress: mintAddress.toBase58(),
+        sharerAddress: sharerAddress.toBase58(),
+        amountForSharer: amountForSharer.toString(),
+        amountForInteractor: amountForInteractor.toString(),
+      });
+
+      // Lấy thông tin NFT
       const nftDetails = await getNFTDetails(mintAddress);
 
       const responseBody = {
@@ -63,66 +97,78 @@ app
       res.json(responseBody);
     } catch (error) {
       console.error("Error in GET request:", error);
-      res.status(500).json({ error: "Failed to fetch NFT details" });
+      res.status(500).json({ error: "Failed to fetch action details" });
     }
   })
   .post(async (req, res) => {
-    const { mintAddress, sharerAddress, amountForSharer, amountForInteractor } =
-      req.query;
+    const actionPDA = req.params.pda;
     const userPubkey = req.body.account;
 
-    if (
-      !mintAddress ||
-      !sharerAddress ||
-      !amountForSharer ||
-      !amountForInteractor
-    ) {
-      return res.status(400).json({ error: "Missing required parameters" });
-    }
-
-    // Chuyển đổi địa chỉ thành chuỗi để đảm bảo so sánh nhất quán
-    const sharerAddressString = new PublicKey(sharerAddress).toString();
-    const userPubkeyString = new PublicKey(userPubkey).toString();
-
-    // Kiểm tra xem user có phải là sharer không
-    if (userPubkeyString === sharerAddressString) {
-      return res.status(400).json({
-        error: "Invalid wallet address",
-        message:
-          "The sharer's wallet address is not eligible to claim the reward. Please use a different wallet.",
-      });
+    if (!actionPDA) {
+      return res.status(400).json({ error: "Missing PDA parameter" });
     }
 
     const connection = new Connection(clusterApiUrl("devnet"));
     const programId = new PublicKey(idl.address);
     const program = new Program(idl, programId);
 
-    const nftAddress = new PublicKey(mintAddress);
-    const sharerAddressPubkey = new PublicKey(sharerAddress);
-    const interactorAddress = new PublicKey(userPubkey);
-
-    const [nftVaultPda] = PublicKey.findProgramAddressSync(
-      [Buffer.from("nft_vault"), nftAddress.toBuffer()],
-      programId
-    );
-
     try {
-      const accountInfo = await connection.getAccountInfo(nftVaultPda);
+      // Tìm PDA
+      const [nftActionPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("action"), new PublicKey(actionPDA).toBuffer()],
+        programId
+      );
+
+      // Lấy thông tin tài khoản
+      const accountInfo = await connection.getAccountInfo(nftActionPda);
 
       if (!accountInfo) {
+        return res.status(404).json({ error: "Action PDA not found" });
+      }
+
+      // Giải mã dữ liệu tài khoản
+      const decodedAccountInfo = program.coder.accounts.decode(
+        "actionData",
+        accountInfo.data
+      );
+
+      const {
+        mintAddress,
+        sharerAddress,
+        amountForSharer,
+        amountForInteractor,
+      } = decodedAccountInfo;
+
+      // Kiểm tra xem user có phải là sharer không
+      if (userPubkey === sharerAddress.toString()) {
+        return res.status(400).json({
+          error: "Invalid wallet address",
+          message:
+            "The sharer's wallet address is not eligible to claim the reward. Please use a different wallet.",
+        });
+      }
+
+      const [nftVaultPda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("nft_vault"), mintAddress.toBuffer()],
+        programId
+      );
+
+      const vaultAccountInfo = await connection.getAccountInfo(nftVaultPda);
+
+      if (!vaultAccountInfo) {
         return res
           .status(400)
           .json({ error: "NFT Vault account does not exist" });
       }
 
-      const decodedAccountInfo = program.coder.accounts.decode(
+      const decodedVaultInfo = program.coder.accounts.decode(
         "nftVault",
-        accountInfo.data
+        vaultAccountInfo.data
       );
 
       if (
-        decodedAccountInfo.interacted.some((addr) =>
-          addr.equals(interactorAddress)
+        decodedVaultInfo.interacted.some((addr) =>
+          addr.equals(new PublicKey(userPubkey))
         )
       ) {
         return res.status(400).json({
@@ -139,9 +185,9 @@ app
         .withdrawFromVault(new BN(amountForSharer), new BN(amountForInteractor))
         .accounts({
           nftVault: nftVaultPda,
-          nft: nftAddress,
-          sharer: sharerAddressPubkey,
-          interactor: interactorAddress,
+          nft: mintAddress,
+          sharer: sharerAddress,
+          interactor: new PublicKey(userPubkey),
           systemProgram: web3.SystemProgram.programId,
         })
         .instruction();
