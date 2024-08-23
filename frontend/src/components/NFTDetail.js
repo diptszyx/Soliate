@@ -19,14 +19,13 @@ function NFTDetail({ walletAddress }) {
   const [copied, setCopied] = useState(false);
   const [vaultInfo, setVaultInfo] = useState(null);
   const [isCampaignEnded, setIsCampaignEnded] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const fetchVaultInfo = useCallback(
     async (connection) => {
       try {
         const programId = new PublicKey(idl.address);
-
         const nftAddress = new PublicKey(address);
-
         const [nftVaultPda] = PublicKey.findProgramAddressSync(
           [Buffer.from("nft_vault"), nftAddress.toBuffer()],
           programId
@@ -50,11 +49,7 @@ function NFTDetail({ walletAddress }) {
           interactionsCount: decodedAccountInfo.interacted.length.toString(),
         });
 
-        if (parseInt(decodedAccountInfo.balance.toString()) === 0) {
-          setIsCampaignEnded(true);
-        } else {
-          setIsCampaignEnded(false);
-        }
+        setIsCampaignEnded(parseInt(decodedAccountInfo.balance.toString()) === 0);
       } catch (error) {
         console.error("Error fetching vault info:", error);
       }
@@ -94,28 +89,12 @@ function NFTDetail({ walletAddress }) {
       });
       return;
     }
-    const amountForSharer =
-      nft.json?.attributes.find((attr) => attr.trait_type === "SOL per Sharer")
-        ?.value || "0";
-    const amountForInteractor =
-      nft.json?.attributes.find(
-        (attr) => attr.trait_type === "SOL per Interactor"
-      )?.value || "0";
 
-    const amountForSharerLamports = Math.round(
-      parseFloat(amountForSharer) * 1e9
-    );
-    const amountForInteractorLamports = Math.round(
-      parseFloat(amountForInteractor) * 1e9
-    );
+    setIsGenerating(true);
 
     try {
       const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
       const programId = new PublicKey(idl.address);
-      const provider = new AnchorProvider(connection, window.solana, {
-        preflightCommitment: "confirmed",
-      });
-      setProvider(provider);
 
       const [actionPDA] = PublicKey.findProgramAddressSync(
         [
@@ -125,6 +104,38 @@ function NFTDetail({ walletAddress }) {
         ],
         programId
       );
+
+      const accountInfo = await connection.getAccountInfo(actionPDA);
+      
+      if (accountInfo !== null) {
+        const blinkUrl = `https://dial.to/?action=solana-action:https://api.soliate.xyz/api/action/${actionPDA.toBase58()}`;
+        setBlinkUrl(blinkUrl);
+        toast.success("Blink URL retrieved successfully!", {
+          position: "top-center",
+          autoClose: 2000,
+        });
+        return;
+      }
+
+      const amountForSharer =
+        nft.json?.attributes.find((attr) => attr.trait_type === "SOL per Sharer")
+          ?.value || "0";
+      const amountForInteractor =
+        nft.json?.attributes.find(
+          (attr) => attr.trait_type === "SOL per Interactor"
+        )?.value || "0";
+
+      const amountForSharerLamports = Math.round(
+        parseFloat(amountForSharer) * 1e9
+      );
+      const amountForInteractorLamports = Math.round(
+        parseFloat(amountForInteractor) * 1e9
+      );
+
+      const provider = new AnchorProvider(connection, window.solana, {
+        preflightCommitment: "confirmed",
+      });
+      setProvider(provider);
 
       const program = new Program(idl, programId);
       const tx = await program.methods
@@ -138,17 +149,28 @@ function NFTDetail({ walletAddress }) {
           actionPda: actionPDA,
           user: new PublicKey(walletAddress),
           mintAddress: new PublicKey(address),
-          sharerAddress: new PublicKey(walletAddress), 
+          sharerAddress: new PublicKey(walletAddress),
           systemProgram: web3.SystemProgram.programId,
         })
         .transaction();
 
       await provider.sendAndConfirm(tx);
+      
       const blinkUrl = `https://dial.to/?action=solana-action:https://api.soliate.xyz/api/action/${actionPDA.toBase58()}`;
       setBlinkUrl(blinkUrl);
+      
+      toast.success("Blink URL generated successfully!", {
+        position: "top-center",
+        autoClose: 2000,
+      });
     } catch (error) {
-      console.error("Error creating action PDA:", error);
-      toast.error("Failed to generate Blink URL. Please try again.");
+      console.error("Error creating or retrieving action PDA:", error);
+      toast.error("Failed to generate Blink URL. Please try again.", {
+        position: "top-center",
+        autoClose: 2000,
+      });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -187,16 +209,20 @@ function NFTDetail({ walletAddress }) {
         {vaultInfo && (
           <div className={styles.vaultInfo}>
             <p>Remaining Budget: {parseFloat(vaultInfo.balance) / 1e9} SOL</p>
-            <p>Interactions : {vaultInfo.interactionsCount}</p>
+            <p>Interactions: {vaultInfo.interactionsCount}</p>
           </div>
         )}
 
         <button
           className={styles.button}
           onClick={handleGenerateBlink}
-          disabled={isCampaignEnded}
+          disabled={isCampaignEnded || isGenerating}
         >
-          {isCampaignEnded ? "Campaign Ended" : "Generate Blink"}
+          {isCampaignEnded
+            ? "Campaign Ended"
+            : isGenerating
+            ? "Generating..."
+            : "Generate Blink"}
         </button>
 
         {blinkUrl && (
