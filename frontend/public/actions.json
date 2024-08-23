@@ -2,7 +2,7 @@
   "rules": [
     {
       "pathPattern": "/blink/**",
-      "apiPath": "https://backend-sigma-silk-80.vercel.app/api/action/**"
+      "apiPath": "https://api.soliate.xyz/api/action**"
     }
   ]
 }

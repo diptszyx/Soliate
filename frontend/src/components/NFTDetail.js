@@ -118,7 +118,11 @@ function NFTDetail({ walletAddress }) {
       setProvider(provider);
 
       const [actionPDA] = PublicKey.findProgramAddressSync(
-        [Buffer.from("action"), new PublicKey(address).toBuffer()],
+        [
+          Buffer.from("action"),
+          new PublicKey(address).toBuffer(),
+          new PublicKey(walletAddress).toBuffer(), 
+        ],
         programId
       );
 
@@ -139,7 +143,7 @@ function NFTDetail({ walletAddress }) {
         .transaction();
 
       await provider.sendAndConfirm(tx);
-      const blinkUrl = `https://dial.to/?action=solana-action:http://localhost:3001/api/action/${actionPDA.toBase58()}`;
+      const blinkUrl = `https://dial.to/?action=solana-action:https://api.soliate.xyz/api/action${actionPDA.toBase58()}`;
       setBlinkUrl(blinkUrl);
     } catch (error) {
       console.error("Error creating action PDA:", error);

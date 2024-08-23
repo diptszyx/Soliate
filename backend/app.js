@@ -113,14 +113,9 @@ app
     const program = new Program(idl, programId);
 
     try {
-      // Tìm PDA
-      const [nftActionPda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("action"), new PublicKey(actionPDA).toBuffer()],
-        programId
+      const accountInfo = await connection.getAccountInfo(
+        new PublicKey(actionPDA)
       );
-
-      // Lấy thông tin tài khoản
-      const accountInfo = await connection.getAccountInfo(nftActionPda);
 
       if (!accountInfo) {
         return res.status(404).json({ error: "Action PDA not found" });

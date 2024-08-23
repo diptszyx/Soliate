@@ -1,5 +1,5 @@
 {
-  "address": "8VrAqUMUAht5KTJXbmqAbfnnS1MFGTBtkSPCw8dELrV",
+  "address": "FfmmkzTpkFE8RMEbL4ULMChEpn6oZ6m5vg6M1uwiRo3q",
   "metadata": {
     "name": "soliate",
     "version": "0.1.0",
@@ -73,6 +73,10 @@
               {
                 "kind": "account",
                 "path": "mint_address"
+              },
+              {
+                "kind": "account",
+                "path": "sharer_address"
               }
             ]
           }
@@ -84,6 +88,9 @@
         },
         {
           "name": "mint_address"
+        },
+        {
+          "name": "sharer_address"
         },
         {
           "name": "system_program",
