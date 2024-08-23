@@ -2,7 +2,7 @@
   "rules": [
     {
       "pathPattern": "/blink/**",
-      "apiPath": "https://api.soliate.xyz/api/action**"
+      "apiPath": "https://api.soliate.xyz/api/action/**"
     }
   ]
 }
